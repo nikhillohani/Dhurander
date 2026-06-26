@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tool Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=61" />
+</head>
+<body>
+  <div class="splash-screen" id="splash-screen">
+    <div class="splash-card">
+      <div class="splash-photo-wrap">
+        <img src="assets/dp.jpg" alt="Nikhil Lohani" class="splash-photo" />
+      </div>
+      <div class="splash-kicker">Developed By</div>
+      <div class="splash-credit">Nikhil Lohani</div>
+      <div class="splash-team">Creative Design Team</div>
+      <div class="splash-line"><span></span></div>
+    </div>
+  </div>
+
+  <!-- ── HEADER ── -->
+  <header class="hdr">
+    <img class="brand-logo" src="assets/mapjson-logo.jpg" alt="MapJSON" />
+  </header>
+
+  <main class="tool-hub" id="tool-hub" aria-labelledby="tool-hub-title">
+    <section class="hub-hero">
+      <div>
+        <div class="hub-kicker">Tool Hub Architecture</div>
+        <h1 id="tool-hub-title">Choose your workspace</h1>
+        <p>Open MapJSON, then use ScanMaster for scanning tools and Yt video downloader.</p>
+      </div>
+      <button class="theme-toggle hub-theme-toggle" id="theme-toggle" type="button" onclick="App.toggleThemeMode()">Night</button>
+    </section>
+    <section class="tool-grid" aria-label="Available tools">
+      <article class="tool-card mapjson-tool-card">
+        <div class="tool-card-icon" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15"/><path d="M15 6v15"/></svg>
+        </div>
+        <div class="tool-card-copy">
+          <span>Existing Tool</span>
+          <h2>MapJSON</h2>
+          <p>Build location JSON entries from Google Maps URLs and manual address details.</p>
+        </div>
+        <button type="button" onclick="App.showTool('mapjson')">Open MapJSON</button>
+      </article>
+    </section>
+  </main>
+
+  <!-- ── BODY ── -->
+  <div class="shell tool-workspace" id="mapjson-workspace" hidden>
+
+    <!-- LEFT: GROUPS -->
+    <div class="left" id="left-col">
+      <div class="left-tabs" role="tablist" aria-label="Workspace sections">
+        <button class="left-tab is-active" id="left-tab-address" type="button" role="tab" aria-selected="true" aria-controls="address-tab-panel" onclick="App.switchLeftTab('address')">Address</button>
+        <button class="left-tab" id="left-tab-fonts" type="button" role="tab" aria-selected="false" aria-controls="fonts-tab-panel" onclick="App.switchLeftTab('fonts')">ScanMaster</button>
+      </div>
+      <div class="hdr-pills workspace-status">
+        <span class="health-light" title="Status indicator" aria-label="Status indicator"></span>
+        <span class="pill version">V6</span>
+        <span class="pill">Filled: <strong id="total-count">0</strong></span>
+        <span class="pill timer-pill" id="task-timer">00:00</span>
+        <span class="pill accent" id="storage-pill">Storage ready</span>
+      </div>
+
+      <div class="left-tab-panels">
+        <div class="left-tab-panel is-active" id="address-tab-panel" role="tabpanel" aria-labelledby="left-tab-address">
+          <div class="address-toolbar">
+            <button class="undo-btn" id="undo-btn" type="button" onclick="App.undoLastChange()" disabled>Undo</button>
+            <button class="undo-btn" id="redo-btn" type="button" onclick="App.redoLastChange()" disabled>Redo</button>
+          </div>
+          <div id="groups-container"></div>
+        </div>
+
+        <div class="left-tab-panel" id="fonts-tab-panel" role="tabpanel" aria-labelledby="left-tab-fonts" hidden>
+          <div class="tool-mode-switch" role="tablist" aria-label="Tool mode">
+            <button class="is-active" type="button" data-tool-switch="scanmaster" onclick="App.setActiveToolOutput('scanmaster')">ScanMaster</button>
+            <button type="button" data-tool-switch="yt" onclick="App.setActiveToolOutput('yt')">YT Grabber</button>
+          </div>
+          <div class="tool-input-stack">
+            <section class="tool-input-group is-active" id="font-finder-panel">
+              <div class="tool-input-title">ScanMaster <span>New</span></div>
+              <input id="font-url-input" type="url" placeholder="https://example.com" oninput="App.validateFontFinder()" />
+              <button class="tool-action-btn font-scan-btn" id="font-scan-btn" type="button" onclick="App.scanWebsiteFonts()" disabled>
+                Find Assets
+              </button>
+              <div class="lookup-loading" id="font-loading" aria-live="polite">
+                <div class="modern-loader"><span></span><span></span><span></span></div>
+                <b>Scanning fonts and image assets...</b>
+              </div>
+              <div class="hint" id="font-finder-hint"></div>
+              <div class="scanmaster-empty-state" id="scanmaster-empty-state">
+                Results appear after Find Assets completes.
+              </div>
+            </section>
+
+            <div class="tool-input-divider"></div>
+
+            <section class="tool-input-group yt-input-group" id="yt-grabber-panel">
+              <div class="tool-input-title">
+                YT Grabber <span>New</span>
+                <b class="youtube-mark" aria-hidden="true">▶</b>
+              </div>
+              <input id="video-url-input" type="url" placeholder="https://www.youtube.com/watch?v=..." oninput="App.validateVideoUrl()" />
+              <button class="tool-action-btn video-fetch-btn" id="video-fetch-btn" type="button" onclick="App.fetchVideoMetadata()" disabled>
+                Find Video
+              </button>
+              <div class="lookup-loading" id="video-loading" aria-live="polite">
+                <div class="modern-loader"><span></span><span></span><span></span></div>
+                <b id="video-loading-text">Fetching video details...</b>
+              </div>
+              <div class="hint" id="video-hint"></div>
+            </section>
+          </div>
+
+      <section class="tool-output-panel" id="tool-output-panel" hidden>
+        <button class="tool-output-close" type="button" aria-label="Close results panel" onclick="App.closeToolOutputPanel()">×</button>
+        <div class="tool-output-view is-active" id="scanmaster-output" data-tool-output="scanmaster">
+          <div class="scan-tabs" role="tablist" aria-label="ScanMaster result sections">
+            <button class="is-active" type="button" data-scan-tab="fonts" onclick="App.switchScanResultTab('fonts')">Fonts</button>
+            <button type="button" data-scan-tab="images" onclick="App.switchScanResultTab('images')">Images</button>
+            <button type="button" data-scan-tab="colours" onclick="App.switchScanResultTab('colours')">Colours</button>
+          </div>
+          <div class="scan-actions-row">
+            <button class="scan-action-btn" id="scan-select-all-btn" type="button" onclick="App.handleScanAction('selectAll')" disabled>Select all</button>
+            <button class="scan-action-btn" id="scan-download-selected-btn" type="button" onclick="App.handleScanAction('downloadSelected')" disabled>Download selected</button>
+            <button class="scan-action-btn" id="scan-download-all-btn" type="button" onclick="App.handleScanAction('downloadAll')" disabled>Download all</button>
+            <button class="scan-action-btn" id="scan-clear-selection-btn" type="button" onclick="App.handleScanAction('clearSelection')" disabled>Clear all</button>
+          </div>
+          <div class="scan-download-progress" id="scan-download-progress" hidden aria-live="polite">
+            <span class="scan-progress-spinner" aria-hidden="true"></span>
+            <b id="scan-progress-title">Preparing download</b>
+            <em id="scan-progress-time">00:00</em>
+          </div>
+          <div class="scan-output-empty" id="scan-output-empty">
+            <b>ScanMaster results</b>
+            <span>Run a scan to fill this panel with fonts, images, and colours.</span>
+          </div>
+          <div class="font-results is-hidden" id="font-results"></div>
+        </div>
+
+        <div class="tool-output-view" id="yt-output" data-tool-output="yt">
+          <section class="video-results" id="video-results" hidden>
+            <div class="video-hero-row">
+              <div class="video-thumbnail-wrap">
+                <img id="video-thumbnail" alt="" />
+                <span class="video-play-mark" aria-hidden="true">▶</span>
+              </div>
+              <h2 id="video-title">Untitled video</h2>
+            </div>
+            <div class="video-meta-grid">
+              <div><span>Uploader</span><b id="video-uploader">-</b></div>
+              <div><span>Duration</span><b id="video-duration">-</b></div>
+              <div><span>Best Quality</span><b id="video-best-quality">-</b></div>
+              <div><span>Estimated Size</span><b id="video-best-size">-</b></div>
+            </div>
+            <div class="video-actions">
+              <div class="video-quality-actions" id="video-quality-actions"></div>
+              <button class="tool-action-btn audio-download-btn" id="audio-download-btn" type="button" onclick="App.downloadBestAudio()">Download MP3</button>
+            </div>
+            <div class="video-card-status" id="video-card-status" hidden></div>
+            <div class="quality-list" id="video-quality-list" hidden></div>
+            <article class="video-progress-panel" id="video-progress-panel" hidden>
+              <div class="progress-track"><span id="video-progress-bar"></span></div>
+              <div class="video-progress-copy">
+                <span id="video-progress-label">0%</span>
+                <button class="video-cancel-btn" id="video-cancel-download-btn" type="button" onclick="App.cancelVideoDownload()" hidden>Cancel Download</button>
+              </div>
+            </article>
+          </section>
+          <div class="tool-output-empty" id="video-empty-state">
+            <h2>Paste a YouTube URL and find video details.</h2>
+          </div>
+        </div>
+      </section>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: OUTPUT -->
+    <div class="right">
+      <div class="panel url-panel">
+        <div class="panel-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          Google Maps URL → Full JSON Entry
+          <span class="accuracy-tag accuracy-primary">Accuracy 99%</span>
+        </div>
+
+        <div class="fg">
+          <label class="lbl">Paste a Google Maps URL here</label>
+          <textarea id="url-lookup-input" rows="3" oninput="App.validateLookupInputs()"
+            placeholder="https://www.google.com/maps"></textarea>
+        </div>
+
+        <div class="fg">
+          <label class="lbl">CTA URL</label>
+          <select id="cta-choice" class="native-cta-choice" required onchange="App.handleCtaChoiceChange(); App.syncGlobalCta();">
+            <option value="https://www.vdx.tv/">https://www.vdx.tv/</option>
+            <option value="custom">Custom URL</option>
+          </select>
+          <div class="cta-quick-row">
+            <input type="url" id="cta-quick-value" value="https://www.vdx.tv/" readonly aria-label="CTA URL" />
+            <button class="cta-custom-btn" id="cta-custom-btn" type="button" onclick="App.enableCustomCta()">Custom URL?</button>
+          </div>
+          <input type="url" id="url-lookup-cta" class="custom-cta-input is-hidden" placeholder="https://example.com" oninput="App.validateLookupInputs(); App.syncGlobalCta(); App.handleCtaChoiceChange();" />
+        </div>
+        <label class="check-row">
+          <input type="checkbox" id="global-cta-enabled" onchange="App.syncGlobalCta()" />
+          <span>Use this CTA URL for every saved address</span>
+        </label>
+
+        <button class="geo-search-btn" id="url-lookup-btn" onclick="App.lookupFromUrl()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Extract &amp; Build Entry
+        </button>
+        <div class="lookup-loading" id="lookup-loading" aria-live="polite">
+          <div class="modern-loader">
+            <span></span><span></span><span></span>
+          </div>
+          <b id="lookup-loading-text">Extracting map data...</b>
+        </div>
+        <div class="hint" id="url-lookup-hint"></div>
+      </div>
+
+      <div class="panel address-lookup-panel" id="address-lookup-panel">
+        <div class="panel-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Address Details → Full JSON Entry
+          <span class="accuracy-tag">Accuracy 98%</span>
+          <span class="new-tag">New</span>
+        </div>
+        <div class="beta-note" id="address-beta-note">
+          Beta phase: manual address accuracy is around 90%. Please double-check the location before adding.
+        </div>
+        <div class="address-format-note">
+          Paste name, street, and city/state/ZIP.
+          <span>The Well Cafe<br>12 Market Street<br>Denver, CO 80202</span>
+        </div>
+
+        <div class="fg">
+          <label class="lbl">Address Details</label>
+          <textarea id="address-lookup-input" rows="3" oninput="App.validateLookupInputs()"
+            placeholder="The Well Cafe&#10;12 Market Street&#10;Denver, CO 80202"></textarea>
+        </div>
+        <button class="geo-search-btn" id="address-lookup-btn" onclick="App.lookupFromAddress()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Search &amp; Build Entry
+        </button>
+        <div class="lookup-loading" id="address-lookup-loading" aria-live="polite">
+          <div class="modern-loader">
+            <span></span><span></span><span></span>
+          </div>
+          <b id="address-lookup-loading-text">Searching address details...</b>
+        </div>
+        <div class="hint" id="address-lookup-hint"></div>
+      </div>
+
+      <!-- JSON Output -->
+      <div class="panel">
+        <div class="out-hdr">
+          <span class="panel-title" style="margin:0">Latest JSON Output</span>
+          <button class="copy-sm" id="copy-btn" onclick="App.copyLatest()">Copy</button>
+        </div>
+        <div class="json-tabs" id="json-tabs">
+          <button type="button" data-slot-index="0" onclick="App.selectSlot(0)">Address 1</button>
+          <button type="button" data-slot-index="1" onclick="App.selectSlot(1)">Address 2</button>
+          <button type="button" data-slot-index="2" onclick="App.selectSlot(2)">Address 3</button>
+        </div>
+        <div class="optional-phone json-phone-tools" id="json-phone-wrap">
+          <button class="json-more-toggle" id="json-more-toggle" type="button" onclick="App.toggleJsonOptionsMenu()">Wanna add more option?</button>
+          <div class="json-more-panel is-hidden" id="json-more-panel">
+            <div class="json-field-option country-option" data-field="country">
+              <div>
+                <span>Country</span>
+                <small>Adds "country": "USA"</small>
+              </div>
+              <b>Field</b>
+              <button type="button" onclick="App.addJsonField('country')">Add</button>
+              <button type="button" onclick="App.removeJsonField('country')">Remove</button>
+            </div>
+            <div class="json-field-option phone-option" data-field="phone">
+              <div>
+                <span>Number</span>
+                <small>Adds "phone": ""</small>
+              </div>
+              <b>Field</b>
+              <button type="button" onclick="App.addJsonField('phone')">Add</button>
+              <button type="button" onclick="App.removeJsonField('phone')">Remove</button>
+            </div>
+          </div>
+          <div class="phone-field is-hidden" id="json-country-field">
+            <label class="lbl" for="json-country-input">Country for selected address</label>
+            <div class="phone-save-row">
+              <input id="json-country-input" type="text" placeholder="USA" />
+              <button class="phone-save-btn" id="json-country-save" type="button" onclick="App.saveJsonCountry()">Save</button>
+            </div>
+          </div>
+          <div class="phone-field is-hidden" id="json-phone-field">
+            <label class="lbl" for="json-phone-input">Phone for selected address</label>
+            <div class="phone-save-row">
+              <input id="json-phone-input" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="5551234567" oninput="App.sanitizeJsonPhoneInput()" />
+              <button class="phone-save-btn" id="json-phone-save" type="button" onclick="App.saveJsonPhoneNumber()">Save</button>
+            </div>
+          </div>
+        </div>
+        <div class="json-editor">
+          <pre class="json-highlight" id="json-highlight" aria-hidden="true"></pre>
+          <textarea class="json-box" id="json-out" spellcheck="false" oninput="App.handleJsonEdit()" onscroll="App.syncJsonScroll()" placeholder="JSON appears here after extraction."></textarea>
+        </div>
+        <div class="hint" id="json-edit-hint"></div>
+      </div>
+
+
+
+      <!-- Owner Usage Log -->
+      <div class="panel usage-panel admin-only" id="owner-usage-panel" style="display:none">
+        <div class="out-hdr">
+          <span class="panel-title" style="margin:0">Local Owner Log</span>
+          <button class="copy-sm" onclick="App.clearUsageLog()">Clear</button>
+        </div>
+        <div id="usage-list"><div class="empty-hist">No usage yet.</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="success-modal" id="success-modal" aria-live="polite">
+    <div class="success-card">
+      <div class="success-visual">
+        <img src="assets/smile-emoji.gif" alt="" aria-hidden="true" />
+      </div>
+      <div class="success-title">Great Job!</div>
+      <div class="success-copy" id="success-copy">Your JSON was generated in just 00:00.</div>
+      <div class="review-box">
+        <div class="review-title">Quick Reaction</div>
+        <div class="review-actions">
+          <button class="review-choice" type="button" data-review-value="like" onclick="App.setReviewChoice('like')" aria-label="Thumbs up"><span aria-hidden="true">👍</span></button>
+          <button class="review-choice" type="button" data-review-value="dislike" onclick="App.setReviewChoice('dislike')" aria-label="Thumbs down"><span aria-hidden="true">👎</span></button>
+        </div>
+        <div class="review-followup is-hidden" id="review-followup">
+          <div class="review-question">Please share your suggestion if you have?</div>
+          <input id="review-name" type="text" placeholder="Your name" />
+          <textarea id="review-suggestion" rows="3" placeholder="Suggestion"></textarea>
+        </div>
+      </div>
+      <button type="button" onclick="App.closeSuccessModal()">Done</button>
+    </div>
+  </div>
+
+  <div class="install-modal" id="install-modal" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="install-modal-title">
+    <div class="install-card">
+      <button class="install-close" type="button" onclick="App.closeChromeInstallModal()" aria-label="Close">×</button>
+      <div class="install-icon" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 3h8M4.1 8.2l4 7M15.2 15.2l-4 6.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="install-title" id="install-modal-title">Add MapJSON to Chrome</div>
+      <p class="install-copy">Chrome requires users to approve extensions. Until the extension is published on the Chrome Web Store, load the bundled folder locally.</p>
+      <ol class="install-steps">
+        <li>Open <b>chrome://extensions</b>.</li>
+        <li>Turn on <b>Developer mode</b>.</li>
+        <li>Click <b>Load unpacked</b>.</li>
+        <li>Select the <b>chrome-extension</b> folder from this project.</li>
+      </ol>
+      <div class="install-actions">
+        <button type="button" onclick="App.openChromeExtensionsPage()">Open Extensions</button>
+        <button type="button" class="install-secondary" onclick="App.closeChromeInstallModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="dev-credit">Developed by Nikhil</footer>
+  <script src="js/app.js?v=59"></script>
+</body>
+</html>
