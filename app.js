@@ -16,15 +16,16 @@ const App = (() => {
   const CHROME_WEB_STORE_URL = ''; // Add the published Chrome Web Store URL here when it is ready.
   const OWNER_NAMES = ['nikhil', 'nikhil lohani'];
   const DEFAULT_CTA_URL = 'https://www.vdx.tv/';
-  const LOCAL_FONT_ENDPOINT = 'https://dhurander-api.onrender.com/api/fonts';
-  const LOCAL_FONT_ENDPOINT_ALT = 'http://localhost:8788/api/fonts';
-  const LOCAL_FONT_DOWNLOAD_ENDPOINT = 'https://dhurander-api.onrender.com';
-  const LOCAL_FONT_ZIP_ENDPOINT = 'https://dhurander-api.onrender.com';
-  const LOCAL_ASSET_DOWNLOAD_ENDPOINT = 'https://dhurander-api.onrender.com';
-  const LOCAL_ASSET_ZIP_ENDPOINT = 'https://dhurander-api.onrender.com';
-  const LOCAL_VIDEO_INFO_ENDPOINT = 'https://dhurander-api.onrender.com/api/video/info';
-  const LOCAL_VIDEO_DOWNLOAD_ENDPOINT = 'https://dhurander-api.onrender.com/api/video/download';
-  const LOCAL_VIDEO_AUDIO_ENDPOINT = 'https://dhurander-api.onrender.com/api/video/download-audio';
+  const RENDER_API_BASE = 'https://dhurander-api.onrender.com';
+  const LOCAL_FONT_ENDPOINT = `${RENDER_API_BASE}/api/fonts`;
+  const LOCAL_FONT_ENDPOINT_ALT = `${RENDER_API_BASE}/api/fonts`;
+  const LOCAL_FONT_DOWNLOAD_ENDPOINT = `${RENDER_API_BASE}/api/font-download`;
+  const LOCAL_FONT_ZIP_ENDPOINT = `${RENDER_API_BASE}/api/font-download-zip`;
+  const LOCAL_ASSET_DOWNLOAD_ENDPOINT = `${RENDER_API_BASE}/api/asset-download`;
+  const LOCAL_ASSET_ZIP_ENDPOINT = `${RENDER_API_BASE}/api/asset-download-zip`;
+  const LOCAL_VIDEO_INFO_ENDPOINT = `${RENDER_API_BASE}/api/video/info`;
+  const LOCAL_VIDEO_DOWNLOAD_ENDPOINT = `${RENDER_API_BASE}/api/video/download`;
+  const LOCAL_VIDEO_AUDIO_ENDPOINT = `${RENDER_API_BASE}/api/video/download-audio`;
   const COLORS = [
     { idx: 1, cls: 'f1', btn: 'sc1' },
     { idx: 2, cls: 'f2', btn: 'sc2' },
@@ -385,16 +386,11 @@ const App = (() => {
     }
     throw new Error(lastError?.message && !/Failed to fetch|Load failed/i.test(lastError.message)
       ? lastError.message
-      : 'Video backend is not reachable. Start or restart the Node backend, then try again.');
+      : 'Video backend is not reachable. Please try again in a moment.');
   }
 
   function getVideoApiBases() {
-    const bases = [''];
-    if (location.protocol === 'file:') bases.push('http://localhost:8788', 'http://localhost:8787');
-    if (location.origin && !bases.includes(location.origin)) bases.push(location.origin);
-    ['http://localhost:8788', 'http://127.0.0.1:8788', 'http://localhost:8787', 'http://127.0.0.1:8787']
-      .forEach(base => { if (!bases.includes(base)) bases.push(base); });
-    return bases;
+    return [RENDER_API_BASE];
   }
 
   function apiUrl(base, path) {
@@ -2639,7 +2635,7 @@ const App = (() => {
     }
     const errorToShow = apiError || lastError;
     throw new Error(errorToShow?.message === 'Failed to fetch'
-      ? 'Font backend is not reachable. Start the backend with npm run dev, then open the local app URL it prints.'
+      ? 'Font backend is not reachable. Please try again in a moment.'
       : (errorToShow?.message || 'Font scan failed.'));
   }
 
@@ -2648,10 +2644,8 @@ const App = (() => {
     const add = endpoint => {
       if (endpoint && !endpoints.includes(endpoint)) endpoints.push(endpoint);
     };
-    const isHttpPage = location.protocol === 'http:' || location.protocol === 'https:';
-    if (isHttpPage) add('/api/fonts');
-    add(LOCAL_FONT_ENDPOINT_ALT);
     add(LOCAL_FONT_ENDPOINT);
+    add(LOCAL_FONT_ENDPOINT_ALT);
     return endpoints;
   }
 
@@ -2946,9 +2940,7 @@ const App = (() => {
   function getFontDownloadEndpoint(font, index, scanEndpointOverride = '') {
     const wrap = document.getElementById('font-results');
     const scanEndpoint = scanEndpointOverride || wrap?.dataset.fontApiEndpoint || '';
-    const downloadEndpoint = scanEndpoint === '/api/fonts'
-      ? '/api/font-download'
-      : scanEndpoint.replace(/\/api\/fonts$/i, '/api/font-download') || LOCAL_FONT_DOWNLOAD_ENDPOINT;
+    const downloadEndpoint = scanEndpoint.replace(/\/api\/fonts$/i, '/api/font-download') || LOCAL_FONT_DOWNLOAD_ENDPOINT;
     const name = getFontFileName(font, index);
     return `${downloadEndpoint}?url=${encodeURIComponent(font.url)}&name=${encodeURIComponent(name)}`;
   }
@@ -3012,16 +3004,13 @@ const App = (() => {
   function getFontZipEndpoint() {
     const wrap = document.getElementById('font-results');
     const scanEndpoint = wrap?.dataset.fontApiEndpoint || '';
-    if (scanEndpoint === '/api/fonts') return '/api/font-download-zip';
     return scanEndpoint.replace(/\/api\/fonts$/i, '/api/font-download-zip') || LOCAL_FONT_ZIP_ENDPOINT;
   }
 
   function getAssetDownloadEndpoint(asset, index) {
     const wrap = document.getElementById('font-results');
     const scanEndpoint = wrap?.dataset.fontApiEndpoint || '';
-    const downloadEndpoint = scanEndpoint === '/api/fonts'
-      ? '/api/asset-download'
-      : scanEndpoint.replace(/\/api\/fonts$/i, '/api/asset-download') || LOCAL_ASSET_DOWNLOAD_ENDPOINT;
+    const downloadEndpoint = scanEndpoint.replace(/\/api\/fonts$/i, '/api/asset-download') || LOCAL_ASSET_DOWNLOAD_ENDPOINT;
     const name = getAssetFileName(asset, index);
     return `${downloadEndpoint}?url=${encodeURIComponent(asset.url)}&name=${encodeURIComponent(name)}`;
   }
@@ -3029,7 +3018,6 @@ const App = (() => {
   function getAssetZipEndpoint() {
     const wrap = document.getElementById('font-results');
     const scanEndpoint = wrap?.dataset.fontApiEndpoint || '';
-    if (scanEndpoint === '/api/fonts') return '/api/asset-download-zip';
     return scanEndpoint.replace(/\/api\/fonts$/i, '/api/asset-download-zip') || LOCAL_ASSET_ZIP_ENDPOINT;
   }
 

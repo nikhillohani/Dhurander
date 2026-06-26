@@ -21,7 +21,7 @@ app.use(express.json({ limit: '5mb' }));
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Range');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
@@ -349,7 +349,7 @@ app.use(express.static(__dirname));
 
 app.listen(PORT, async () => {
   await fs.mkdir(VIDEO_DOWNLOAD_DIR, { recursive: true });
-  console.log(`MapJSON backend running at http://localhost:${PORT}`);
+  console.log(`MapJSON backend running on port ${PORT}`);
 });
 
 function getCommandVersion(command, args) {
