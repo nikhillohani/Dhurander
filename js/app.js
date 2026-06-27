@@ -15,16 +15,16 @@ const App = (() => {
   const OWNER_LOG_ENABLED = false; // Local browser-only debug panel. Keep false for live.
   const CHROME_WEB_STORE_URL = ''; // Add the published Chrome Web Store URL here when it is ready.
   const OWNER_NAMES = ['nikhil', 'nikhil lohani'];
-  const DEFAULT_CTA_URL = 'https://www.vdx.tv/';
-  const LOCAL_FONT_ENDPOINT = 'http://localhost:8787/api/fonts';
-  const LOCAL_FONT_ENDPOINT_ALT = 'http://localhost:8788/api/fonts';
-  const LOCAL_FONT_DOWNLOAD_ENDPOINT = 'http://localhost:8787/api/font-download';
-  const LOCAL_FONT_ZIP_ENDPOINT = 'http://localhost:8787/api/font-download-zip';
-  const LOCAL_ASSET_DOWNLOAD_ENDPOINT = 'http://localhost:8787/api/asset-download';
-  const LOCAL_ASSET_ZIP_ENDPOINT = 'http://localhost:8787/api/asset-download-zip';
-  const LOCAL_VIDEO_INFO_ENDPOINT = '/api/video/info';
-  const LOCAL_VIDEO_DOWNLOAD_ENDPOINT = '/api/video/download';
-  const LOCAL_VIDEO_AUDIO_ENDPOINT = '/api/video/download-audio';
+  const RENDER_API_BASE = 'https://dhurander-api.onrender.com';
+  const LOCAL_FONT_ENDPOINT = `${RENDER_API_BASE}/api/fonts`;
+  const LOCAL_FONT_ENDPOINT_ALT = `${RENDER_API_BASE}/api/fonts`;
+  const LOCAL_FONT_DOWNLOAD_ENDPOINT = `${RENDER_API_BASE}/api/font-download`;
+  const LOCAL_FONT_ZIP_ENDPOINT = `${RENDER_API_BASE}/api/font-download-zip`;
+  const LOCAL_ASSET_DOWNLOAD_ENDPOINT = `${RENDER_API_BASE}/api/asset-download`;
+  const LOCAL_ASSET_ZIP_ENDPOINT = `${RENDER_API_BASE}/api/asset-download-zip`;
+  const LOCAL_VIDEO_INFO_ENDPOINT = `${RENDER_API_BASE}/api/video/info`;
+  const LOCAL_VIDEO_DOWNLOAD_ENDPOINT = `${RENDER_API_BASE}/api/video/download`;
+  const LOCAL_VIDEO_AUDIO_ENDPOINT = `${RENDER_API_BASE}/api/video/download-audio`;
   const COLORS = [
     { idx: 1, cls: 'f1', btn: 'sc1' },
     { idx: 2, cls: 'f2', btn: 'sc2' },
